@@ -2,6 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { useNavigate } from 'react-router-dom';
 
 interface Kit {
   id: string;
@@ -17,9 +18,11 @@ interface KitCardProps {
 }
 
 const KitCard: React.FC<KitCardProps> = ({ kit }) => {
+  const navigate = useNavigate();
+
   const handleDonate = () => {
-    console.log(`Donating to ${kit.title}`);
-    // Here you would typically integrate with a payment gateway
+    console.log(`Navigating to donation flow for ${kit.title}`);
+    navigate(`/donate?kit=${kit.id}`);
   };
 
   return (
