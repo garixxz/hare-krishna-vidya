@@ -1,11 +1,10 @@
-
 import React, { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, CreditCard, User, Mail, Phone } from 'lucide-react';
+import { ArrowLeft, CreditCard, User, Mail, Phone, Package } from 'lucide-react';
 
 const DonationFlow = () => {
   const [searchParams] = useSearchParams();
@@ -26,9 +25,27 @@ const DonationFlow = () => {
   });
 
   const kits = {
-    education: { title: 'Education Kit', price: 790, image: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80' },
-    grocery: { title: 'Grocery Kit', price: 1200, image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80' },
-    center: { title: 'Center Kit', price: 35000, image: 'https://images.unsplash.com/photo-1497486751825-1233686d5d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80' }
+    education: { 
+      title: 'Education Kit', 
+      price: 790, 
+      image: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+      items: ['3-5 Recycled Notebooks', '2 Blue Pens', 'Pencils & Eraser', 'Geometry Box', 'Pencil Pouch', 'Hygiene Kit'],
+      description: 'Complete educational supplies to support a child\'s learning journey for an entire academic year.'
+    },
+    grocery: { 
+      title: 'Grocery Kit', 
+      price: 1200, 
+      image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+      items: ['Rice 10Kg', 'Desi Ghee 1L', 'Masoor Dal 5Kg', 'Cooking Oil', 'Spices & Essentials'],
+      description: 'Essential food items to nourish a family of 4-5 members for 2-3 weeks.'
+    },
+    center: { 
+      title: 'Center Kit', 
+      price: 35000, 
+      image: 'https://images.unsplash.com/photo-1497486751825-1233686d5d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+      items: ['Green Board & Stand', 'Charts & Teaching Materials', 'Steel Plates & Glasses', 'Center Board', 'Books & References'],
+      description: 'Complete setup for establishing a community learning center to educate 30-40 children.'
+    }
   };
 
   const selectedKit = kitId && kits[kitId as keyof typeof kits];
@@ -59,23 +76,55 @@ const DonationFlow = () => {
 
   const renderStep1 = () => (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-center">Choose Your Donation Amount</h2>
+      <h2 className="text-2xl font-bold text-center">Kit Details & Donation Amount</h2>
       {selectedKit && (
-        <Card className="mb-6">
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-4">
-              <img src={selectedKit.image} alt={selectedKit.title} className="w-20 h-20 object-cover rounded-lg" />
-              <div>
-                <h3 className="text-xl font-semibold">{selectedKit.title}</h3>
-                <p className="text-gray-600">Suggested: ₹{selectedKit.price.toLocaleString()}</p>
+        <div className="space-y-6">
+          {/* Kit Overview Card */}
+          <Card className="mb-6">
+            <CardContent className="p-6">
+              <div className="flex flex-col md:flex-row items-start space-y-4 md:space-y-0 md:space-x-6">
+                <img src={selectedKit.image} alt={selectedKit.title} className="w-full md:w-32 h-32 object-cover rounded-lg" />
+                <div className="flex-1">
+                  <h3 className="text-2xl font-semibold mb-2">{selectedKit.title}</h3>
+                  <p className="text-gray-600 mb-3">{selectedKit.description}</p>
+                  <div className="flex items-center text-orange-600 font-semibold">
+                    <Package className="w-5 h-5 mr-2" />
+                    Suggested: ₹{selectedKit.price.toLocaleString()}
+                  </div>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+
+          {/* Kit Contents Card */}
+          <Card className="border-orange-200 bg-orange-50">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-xl text-orange-800 flex items-center">
+                <Package className="w-6 h-6 mr-2" />
+                What's Included in This Kit
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="grid md:grid-cols-2 gap-3">
+                {selectedKit.items.map((item, index) => (
+                  <div key={index} className="flex items-center bg-white p-3 rounded-lg border border-orange-200">
+                    <div className="w-3 h-3 bg-orange-400 rounded-full mr-3 flex-shrink-0"></div>
+                    <span className="text-gray-700 font-medium">{item}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 p-4 bg-white rounded-lg border border-orange-200">
+                <p className="text-sm text-gray-600 italic">
+                  💝 Each kit is carefully assembled with quality items and delivered directly to beneficiaries in underserved communities.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       )}
       
       <div className="space-y-4">
-        <Label htmlFor="amount">Donation Amount (₹)</Label>
+        <Label htmlFor="amount" className="text-lg font-semibold">Choose Your Donation Amount (₹)</Label>
         <Input
           id="amount"
           name="amount"
@@ -83,20 +132,26 @@ const DonationFlow = () => {
           placeholder={selectedKit?.price.toString() || "1000"}
           value={formData.amount}
           onChange={handleInputChange}
-          className="text-lg"
+          className="text-lg p-4"
         />
         
-        <div className="grid grid-cols-3 gap-2">
-          {[1000, 2500, 5000].map(amount => (
+        <div className="grid grid-cols-3 gap-3">
+          {[selectedKit?.price || 1000, 2500, 5000].map(amount => (
             <Button
               key={amount}
               variant="outline"
               onClick={() => setFormData(prev => ({ ...prev, amount: amount.toString() }))}
-              className="py-3"
+              className={`py-3 ${formData.amount === amount.toString() ? 'bg-orange-100 border-orange-500' : ''}`}
             >
               ₹{amount.toLocaleString()}
             </Button>
           ))}
+        </div>
+        
+        <div className="text-center">
+          <p className="text-sm text-gray-600">
+            💡 You can donate any amount. The suggested amount covers the full cost of one complete kit.
+          </p>
         </div>
       </div>
     </div>
@@ -249,7 +304,7 @@ const DonationFlow = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
-      <div className="container mx-auto px-6 max-w-2xl">
+      <div className="container mx-auto px-6 max-w-3xl">
         <div className="mb-8">
           <Button 
             variant="ghost" 
