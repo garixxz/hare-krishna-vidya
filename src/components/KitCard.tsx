@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useCart } from '@/contexts/CartContext';
-import { shopping-cart } from 'lucide-react';
+import { ShoppingCart } from 'lucide-react';
 
 interface Kit {
   id: string;
@@ -69,7 +69,7 @@ const KitCard: React.FC<KitCardProps> = ({ kit }) => {
           onClick={handleAddToCart}
           className="w-full bg-orange-600 hover:bg-orange-700 text-white py-3 rounded-lg font-semibold transition-colors duration-300"
         >
-          <shopping-cart className="w-4 h-4 mr-2" />
+          <ShoppingCart className="w-4 h-4 mr-2" />
           Add to Cart
         </Button>
       </CardContent>

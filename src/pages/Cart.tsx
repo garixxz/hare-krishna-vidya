@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Trash2, plus, shopping-cart, ArrowLeft } from 'lucide-react';
+import { Trash2, Plus, ShoppingCart, ArrowLeft } from 'lucide-react';
 
 const Cart = () => {
   const { cartItems, removeFromCart, updateQuantity, getTotalItems, getTotalPrice, clearCart } = useCart();
@@ -21,7 +21,7 @@ const Cart = () => {
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="container mx-auto px-6 max-w-4xl">
           <div className="text-center py-16">
-            <shopping-cart className="w-24 h-24 text-gray-300 mx-auto mb-6" />
+            <ShoppingCart className="w-24 h-24 text-gray-300 mx-auto mb-6" />
             <h1 className="text-3xl font-bold text-gray-800 mb-4">Your Cart is Empty</h1>
             <p className="text-gray-600 mb-8">Add some kits to your cart to make a difference!</p>
             <Button 
@@ -93,7 +93,7 @@ const Cart = () => {
                         size="sm"
                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
                       >
-                        <plus className="w-4 h-4" />
+                        <Plus className="w-4 h-4" />
                       </Button>
                     </div>
                     
