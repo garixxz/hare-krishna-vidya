@@ -41,7 +41,7 @@ const Navigation = () => {
             onClick={() => handleNavigation('/')}
             className="text-2xl font-bold text-orange-600 cursor-pointer hover:text-orange-700 transition-colors"
           >
-            HopeKits
+            Hare Krishna Vidya
           </div>
 
           {/* Desktop Menu */}

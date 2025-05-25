@@ -25,13 +25,13 @@ const DonationSuccess = () => {
   const handleShare = () => {
     if (navigator.share) {
       navigator.share({
-        title: 'I just donated to HopeKits!',
+        title: 'I just donated to Hare Krishna Vidya!',
         text: `I donated ₹${amount?.toLocaleString()} for a ${kit?.title} to help underprivileged communities. Join me in making a difference!`,
         url: window.location.origin
       });
     } else {
       // Fallback for browsers that don't support Web Share API
-      const text = `I just donated ₹${amount?.toLocaleString()} for a ${kit?.title} to @HopeKits! Join me in making a difference. ${window.location.origin}`;
+      const text = `I just donated ₹${amount?.toLocaleString()} for a ${kit?.title} to @HareKrishnaVidya! Join me in making a difference. ${window.location.origin}`;
       navigator.clipboard.writeText(text);
       alert('Share text copied to clipboard!');
     }
