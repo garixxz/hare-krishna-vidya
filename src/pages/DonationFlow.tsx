@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate, useLocation } from 'react-router-dom';
+import { useCart } from '@/contexts/CartContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,10 +10,11 @@ import { ArrowLeft, CreditCard, User, Mail, Phone, Package } from 'lucide-react'
 const DonationFlow = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { cartItems, clearCart } = useCart();
   const kitId = searchParams.get('kit');
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    amount: '',
     firstName: '',
     lastName: '',
     email: '',
@@ -48,7 +50,14 @@ const DonationFlow = () => {
     }
   };
 
+  // Determine if we're processing cart items or single kit
+  const isCartMode = location.state?.cartItems && location.state.cartItems.length > 0;
+  const selectedCartItems = location.state?.cartItems || [];
   const selectedKit = kitId && kits[kitId as keyof typeof kits];
+  
+  const totalAmount = isCartMode 
+    ? selectedCartItems.reduce((total: number, item: any) => total + (item.price * item.quantity), 0)
+    : selectedKit?.price || 0;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
@@ -63,10 +72,14 @@ const DonationFlow = () => {
     } else {
       // Simulate payment processing
       setTimeout(() => {
+        if (isCartMode) {
+          clearCart(); // Clear cart after successful donation
+        }
         navigate('/donation-success', { 
           state: { 
-            kit: selectedKit, 
-            amount: formData.amount || selectedKit?.price,
+            cartItems: isCartMode ? selectedCartItems : undefined,
+            kit: !isCartMode ? selectedKit : undefined,
+            amount: totalAmount,
             donorName: `${formData.firstName} ${formData.lastName}`
           }
         });
@@ -76,84 +89,86 @@ const DonationFlow = () => {
 
   const renderStep1 = () => (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-center">Kit Details & Donation Amount</h2>
-      {selectedKit && (
-        <div className="space-y-6">
-          {/* Kit Overview Card */}
-          <Card className="mb-6">
-            <CardContent className="p-6">
+      <h2 className="text-2xl font-bold text-center">
+        {isCartMode ? 'Your Selected Kits' : 'Kit Details & Donation Amount'}
+      </h2>
+      
+      {isCartMode ? (
+        <div className="space-y-4">
+          {selectedCartItems.map((item: any) => (
+            <Card key={item.id} className="p-6">
               <div className="flex flex-col md:flex-row items-start space-y-4 md:space-y-0 md:space-x-6">
-                <img src={selectedKit.image} alt={selectedKit.title} className="w-full md:w-32 h-32 object-cover rounded-lg" />
+                <img src={item.image} alt={item.title} className="w-full md:w-24 h-24 object-cover rounded-lg" />
                 <div className="flex-1">
-                  <h3 className="text-2xl font-semibold mb-2">{selectedKit.title}</h3>
-                  <p className="text-gray-600 mb-3">{selectedKit.description}</p>
-                  <div className="flex items-center text-orange-600 font-semibold">
-                    <Package className="w-5 h-5 mr-2" />
-                    Suggested: ₹{selectedKit.price.toLocaleString()}
+                  <h3 className="text-lg font-semibold">{item.title}</h3>
+                  <p className="text-gray-600 text-sm">{item.description}</p>
+                  <div className="flex justify-between items-center mt-2">
+                    <span className="text-orange-600 font-semibold">
+                      ₹{item.price.toLocaleString()} × {item.quantity}
+                    </span>
+                    <span className="font-bold">
+                      ₹{(item.price * item.quantity).toLocaleString()}
+                    </span>
                   </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Kit Contents Card */}
-          <Card className="border-orange-200 bg-orange-50">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-xl text-orange-800 flex items-center">
-                <Package className="w-6 h-6 mr-2" />
-                What's Included in This Kit
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="grid md:grid-cols-2 gap-3">
-                {selectedKit.items.map((item, index) => (
-                  <div key={index} className="flex items-center bg-white p-3 rounded-lg border border-orange-200">
-                    <div className="w-3 h-3 bg-orange-400 rounded-full mr-3 flex-shrink-0"></div>
-                    <span className="text-gray-700 font-medium">{item}</span>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-4 p-4 bg-white rounded-lg border border-orange-200">
-                <p className="text-sm text-gray-600 italic">
-                  💝 Each kit is carefully assembled with quality items and delivered directly to beneficiaries in underserved communities.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-      
-      <div className="space-y-4">
-        <Label htmlFor="amount" className="text-lg font-semibold">Choose Your Donation Amount (₹)</Label>
-        <Input
-          id="amount"
-          name="amount"
-          type="number"
-          placeholder={selectedKit?.price.toString() || "1000"}
-          value={formData.amount}
-          onChange={handleInputChange}
-          className="text-lg p-4"
-        />
-        
-        <div className="grid grid-cols-3 gap-3">
-          {[selectedKit?.price || 1000, 2500, 5000].map(amount => (
-            <Button
-              key={amount}
-              variant="outline"
-              onClick={() => setFormData(prev => ({ ...prev, amount: amount.toString() }))}
-              className={`py-3 ${formData.amount === amount.toString() ? 'bg-orange-100 border-orange-500' : ''}`}
-            >
-              ₹{amount.toLocaleString()}
-            </Button>
+            </Card>
           ))}
+          
+          <Card className="p-6 bg-orange-50 border-orange-200">
+            <div className="flex justify-between items-center text-xl font-bold">
+              <span>Total Donation Amount</span>
+              <span className="text-orange-600">₹{totalAmount.toLocaleString()}</span>
+            </div>
+          </Card>
         </div>
-        
-        <div className="text-center">
-          <p className="text-sm text-gray-600">
-            💡 You can donate any amount. The suggested amount covers the full cost of one complete kit.
-          </p>
-        </div>
-      </div>
+      ) : (
+        selectedKit && (
+          <div className="space-y-6">
+            {/* Kit Overview Card */}
+            <Card className="mb-6">
+              <CardContent className="p-6">
+                <div className="flex flex-col md:flex-row items-start space-y-4 md:space-y-0 md:space-x-6">
+                  <img src={selectedKit.image} alt={selectedKit.title} className="w-full md:w-32 h-32 object-cover rounded-lg" />
+                  <div className="flex-1">
+                    <h3 className="text-2xl font-semibold mb-2">{selectedKit.title}</h3>
+                    <p className="text-gray-600 mb-3">{selectedKit.description}</p>
+                    <div className="flex items-center text-orange-600 font-semibold">
+                      <Package className="w-5 h-5 mr-2" />
+                      Suggested: ₹{selectedKit.price.toLocaleString()}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Kit Contents Card */}
+            <Card className="border-orange-200 bg-orange-50">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-xl text-orange-800 flex items-center">
+                  <Package className="w-6 h-6 mr-2" />
+                  What's Included in This Kit
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="grid md:grid-cols-2 gap-3">
+                  {selectedKit.items.map((item, index) => (
+                    <div key={index} className="flex items-center bg-white p-3 rounded-lg border border-orange-200">
+                      <div className="w-3 h-3 bg-orange-400 rounded-full mr-3 flex-shrink-0"></div>
+                      <span className="text-gray-700 font-medium">{item}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-4 p-4 bg-white rounded-lg border border-orange-200">
+                  <p className="text-sm text-gray-600 italic">
+                    💝 Each kit is carefully assembled with quality items and delivered directly to beneficiaries in underserved communities.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )
+      )}
     </div>
   );
 
@@ -257,8 +272,22 @@ const DonationFlow = () => {
       <Card className="p-6 bg-gray-50">
         <h3 className="font-semibold mb-4">Donation Summary</h3>
         <div className="space-y-2">
-          {selectedKit && <p><span className="font-medium">Kit:</span> {selectedKit.title}</p>}
-          <p><span className="font-medium">Amount:</span> ₹{(formData.amount || selectedKit?.price || 0).toLocaleString()}</p>
+          {isCartMode ? (
+            selectedCartItems.map((item: any) => (
+              <div key={item.id} className="flex justify-between">
+                <span className="font-medium">{item.title} × {item.quantity}:</span>
+                <span>₹{(item.price * item.quantity).toLocaleString()}</span>
+              </div>
+            ))
+          ) : (
+            selectedKit && <p><span className="font-medium">Kit:</span> {selectedKit.title}</p>
+          )}
+          <div className="border-t pt-2 mt-2">
+            <div className="flex justify-between font-bold text-lg">
+              <span>Total Amount:</span>
+              <span>₹{totalAmount.toLocaleString()}</span>
+            </div>
+          </div>
           <p><span className="font-medium">Donor:</span> {formData.firstName} {formData.lastName}</p>
           <p><span className="font-medium">Email:</span> {formData.email}</p>
         </div>
@@ -287,12 +316,12 @@ const DonationFlow = () => {
     </div>
   );
 
-  if (!selectedKit) {
+  if (!isCartMode && !selectedKit) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Card className="p-8 text-center">
-          <h2 className="text-2xl font-bold mb-4">Invalid Kit Selection</h2>
-          <p className="text-gray-600 mb-6">Please select a valid kit to proceed with donation.</p>
+          <h2 className="text-2xl font-bold mb-4">Invalid Selection</h2>
+          <p className="text-gray-600 mb-6">Please select a valid kit or add items to cart to proceed with donation.</p>
           <Button onClick={() => navigate('/')}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Home
@@ -308,11 +337,11 @@ const DonationFlow = () => {
         <div className="mb-8">
           <Button 
             variant="ghost" 
-            onClick={() => step === 1 ? navigate('/') : setStep(step - 1)}
+            onClick={() => step === 1 ? navigate(isCartMode ? '/cart' : '/') : setStep(step - 1)}
             className="mb-4"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            {step === 1 ? 'Back to Home' : 'Previous Step'}
+            {step === 1 ? (isCartMode ? 'Back to Cart' : 'Back to Home') : 'Previous Step'}
           </Button>
           
           <div className="flex items-center justify-center space-x-4 mb-8">
@@ -341,7 +370,6 @@ const DonationFlow = () => {
               onClick={handleContinue}
               className="bg-orange-600 hover:bg-orange-700 px-8 py-3 text-lg"
               disabled={
-                (step === 1 && !formData.amount) ||
                 (step === 2 && (!formData.firstName || !formData.lastName || !formData.email || !formData.phone))
               }
             >

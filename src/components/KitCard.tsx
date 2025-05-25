@@ -2,7 +2,8 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { useNavigate } from 'react-router-dom';
+import { useCart } from '@/contexts/CartContext';
+import { shopping-cart } from 'lucide-react';
 
 interface Kit {
   id: string;
@@ -18,11 +19,18 @@ interface KitCardProps {
 }
 
 const KitCard: React.FC<KitCardProps> = ({ kit }) => {
-  const navigate = useNavigate();
+  const { addToCart } = useCart();
 
-  const handleDonate = () => {
-    console.log(`Navigating to donation flow for ${kit.title}`);
-    navigate(`/donate?kit=${kit.id}`);
+  const handleAddToCart = () => {
+    addToCart({
+      id: kit.id,
+      title: kit.title,
+      price: kit.price,
+      image: kit.image,
+      items: kit.items,
+      description: kit.description
+    });
+    console.log(`Added ${kit.title} to cart`);
   };
 
   return (
@@ -58,10 +66,11 @@ const KitCard: React.FC<KitCardProps> = ({ kit }) => {
         </div>
         
         <Button 
-          onClick={handleDonate}
+          onClick={handleAddToCart}
           className="w-full bg-orange-600 hover:bg-orange-700 text-white py-3 rounded-lg font-semibold transition-colors duration-300"
         >
-          Donate Now
+          <shopping-cart className="w-4 h-4 mr-2" />
+          Add to Cart
         </Button>
       </CardContent>
     </Card>
