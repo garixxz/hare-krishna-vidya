@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, CreditCard, User, Mail, Phone, Package } from 'lucide-react';
+import { ArrowLeft, CreditCard, User, Mail, Phone, Package, Home, ShoppingCart } from 'lucide-react';
 
 const DonationFlow = () => {
   const [searchParams] = useSearchParams();
@@ -86,6 +86,65 @@ const DonationFlow = () => {
       }, 2000);
     }
   };
+
+  const handleBackNavigation = () => {
+    if (step === 1) {
+      if (isCartMode) {
+        navigate('/cart');
+      } else {
+        navigate('/?scrollTo=kits');
+      }
+    } else {
+      setStep(step - 1);
+    }
+  };
+
+  // Breadcrumb component
+  const Breadcrumb = () => (
+    <div className="flex items-center space-x-2 text-sm text-gray-600 mb-6">
+      <Button 
+        variant="ghost" 
+        size="sm"
+        onClick={() => navigate('/')}
+        className="p-0 h-auto text-orange-600 hover:text-orange-700"
+      >
+        <Home className="w-4 h-4 mr-1" />
+        Home
+      </Button>
+      <span>›</span>
+      
+      {isCartMode ? (
+        <>
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => navigate('/cart')}
+            className="p-0 h-auto text-orange-600 hover:text-orange-700"
+          >
+            <ShoppingCart className="w-4 h-4 mr-1" />
+            Cart
+          </Button>
+          <span>›</span>
+        </>
+      ) : (
+        <>
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => navigate('/?scrollTo=kits')}
+            className="p-0 h-auto text-orange-600 hover:text-orange-700"
+          >
+            Kits
+          </Button>
+          <span>›</span>
+        </>
+      )}
+      
+      <span className="text-gray-800 font-medium">
+        Donation Flow - Step {step}
+      </span>
+    </div>
+  );
 
   const renderStep1 = () => (
     <div className="space-y-6">
@@ -335,13 +394,15 @@ const DonationFlow = () => {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-6 max-w-3xl">
         <div className="mb-8">
+          <Breadcrumb />
+          
           <Button 
             variant="ghost" 
-            onClick={() => step === 1 ? navigate(isCartMode ? '/cart' : '/') : setStep(step - 1)}
+            onClick={handleBackNavigation}
             className="mb-4"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            {step === 1 ? (isCartMode ? 'Back to Cart' : 'Back to Home') : 'Previous Step'}
+            {step === 1 ? (isCartMode ? 'Back to Cart' : 'Back to Kits') : 'Previous Step'}
           </Button>
           
           <div className="flex items-center justify-center space-x-4 mb-8">

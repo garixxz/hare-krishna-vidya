@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Check, Download, Share2, Heart, Mail } from 'lucide-react';
+import { Check, Download, Share2, Heart, Mail, Home, ArrowLeft } from 'lucide-react';
 
 const DonationSuccess = () => {
   const location = useLocation();
@@ -41,9 +41,28 @@ const DonationSuccess = () => {
     return null;
   }
 
+  // Breadcrumb component
+  const Breadcrumb = () => (
+    <div className="flex items-center space-x-2 text-sm text-gray-600 mb-6">
+      <Button 
+        variant="ghost" 
+        size="sm"
+        onClick={() => navigate('/')}
+        className="p-0 h-auto text-orange-600 hover:text-orange-700"
+      >
+        <Home className="w-4 h-4 mr-1" />
+        Home
+      </Button>
+      <span>›</span>
+      <span className="text-gray-800 font-medium">Donation Success</span>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 py-8">
       <div className="container mx-auto px-6 max-w-2xl">
+        <Breadcrumb />
+        
         <Card className="p-8 text-center">
           <div className="mb-8">
             <div className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -106,7 +125,7 @@ const DonationSuccess = () => {
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
             <Button 
               onClick={handleDownloadReceipt}
               variant="outline"
@@ -123,11 +142,21 @@ const DonationSuccess = () => {
               <Share2 className="w-4 h-4 mr-2" />
               Share Your Impact
             </Button>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/?scrollTo=kits')}
               className="bg-orange-600 hover:bg-orange-700"
             >
               Donate Again
+            </Button>
+            <Button 
+              onClick={() => navigate('/')}
+              variant="outline"
+            >
+              <Home className="w-4 h-4 mr-2" />
+              Back to Home
             </Button>
           </div>
 
