@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Menu, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import CartButton from './CartButton';
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -54,6 +55,7 @@ const Navigation = () => {
                 {item.label}
               </button>
             ))}
+            <CartButton />
             <Button 
               onClick={scrollToKits}
               className="bg-orange-600 hover:bg-orange-700 text-white px-6"
@@ -84,6 +86,9 @@ const Navigation = () => {
                   {item.label}
                 </button>
               ))}
+              <div className="py-2">
+                <CartButton />
+              </div>
               <Button 
                 onClick={scrollToKits}
                 className="bg-orange-600 hover:bg-orange-700 text-white w-full mt-4"
