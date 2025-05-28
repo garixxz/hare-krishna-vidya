@@ -32,6 +32,18 @@ const Navigation = () => {
     setIsMenuOpen(false);
   };
 
+  const scrollToGrocery = () => {
+    if (window.location.pathname === '/') {
+      const grocerySection = document.getElementById('grocery-section');
+      if (grocerySection) {
+        grocerySection.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      navigate('/?scrollTo=grocery');
+    }
+    setIsMenuOpen(false);
+  };
+
   return (
     <nav className="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-b border-gray-200 z-50">
       <div className="container mx-auto px-6">
@@ -55,6 +67,12 @@ const Navigation = () => {
                 {item.label}
               </button>
             ))}
+            <button
+              onClick={scrollToGrocery}
+              className="text-gray-700 hover:text-green-600 transition-colors font-medium"
+            >
+              Grocery Items
+            </button>
             <CartButton />
             <Button 
               onClick={scrollToKits}
@@ -86,6 +104,12 @@ const Navigation = () => {
                   {item.label}
                 </button>
               ))}
+              <button
+                onClick={scrollToGrocery}
+                className="text-left text-gray-700 hover:text-green-600 transition-colors font-medium py-2"
+              >
+                Grocery Items
+              </button>
               <div className="py-2">
                 <CartButton />
               </div>
