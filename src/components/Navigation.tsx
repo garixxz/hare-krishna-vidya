@@ -12,7 +12,9 @@ const Navigation = () => {
   const menuItems = [
     { label: 'Home', path: '/' },
     { label: 'About', path: '/about' },
+    { label: 'Blog', path: '/blog' },
     { label: 'Contact', path: '/contact' },
+    { label: 'Admin', path: '/admin' },
   ];
 
   const handleNavigation = (path: string) => {
