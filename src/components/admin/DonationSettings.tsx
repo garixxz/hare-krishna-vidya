@@ -42,13 +42,13 @@ const DonationSettings = () => {
     { id: 'wheat-flour-10kg', name: 'Wheat Flour 10Kg', currentPrice: 320, newPrice: 320 }
   ]);
 
-  const handleKitPriceChange = (id, newPrice) => {
+  const handleKitPriceChange = (id: string, newPrice: string) => {
     setKits(kits.map(kit => 
       kit.id === id ? { ...kit, newPrice: parseFloat(newPrice) || 0 } : kit
     ));
   };
 
-  const handleGroceryPriceChange = (id, newPrice) => {
+  const handleGroceryPriceChange = (id: string, newPrice: string) => {
     setGroceryItems(groceryItems.map(item => 
       item.id === id ? { ...item, newPrice: parseFloat(newPrice) || 0 } : item
     ));
@@ -150,7 +150,7 @@ const DonationSettings = () => {
             <TableBody>
               {groceryItems.map((item) => {
                 const changePercent = item.currentPrice > 0 
-                  ? ((item.newPrice - item.currentPrice) / item.currentPrice * 100).toFixed(1)
+                  ? ((item.newPrice - item.currentPrice) / item.currentPrice * 100)
                   : 0;
                 
                 return (
@@ -170,7 +170,7 @@ const DonationSettings = () => {
                         changePercent > 0 ? 'text-red-600' : 
                         changePercent < 0 ? 'text-green-600' : 'text-gray-600'
                       }`}>
-                        {changePercent > 0 ? '+' : ''}{changePercent}%
+                        {changePercent > 0 ? '+' : ''}{changePercent.toFixed(1)}%
                       </span>
                     </TableCell>
                   </TableRow>
