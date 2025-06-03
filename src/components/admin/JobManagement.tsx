@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -19,7 +18,8 @@ const JobManagement = () => {
       status: 'Active',
       applications: 12,
       description: 'We are looking for a dedicated Program Coordinator to manage our food distribution programs.',
-      requirements: 'Bachelor\'s degree, 2+ years experience in NGO work'
+      requirements: 'Bachelor\'s degree, 2+ years experience in NGO work',
+      skills: ['Project Management', 'Communication', 'NGO Experience', 'Leadership']
     },
     {
       id: 2,
@@ -30,7 +30,8 @@ const JobManagement = () => {
       status: 'Active',
       applications: 8,
       description: 'Manage and coordinate volunteer activities across different programs.',
-      requirements: 'Experience in volunteer management, excellent communication skills'
+      requirements: 'Experience in volunteer management, excellent communication skills',
+      skills: ['Volunteer Management', 'Event Planning', 'Team Building', 'Communication']
     }
   ]);
 
@@ -79,8 +80,24 @@ const JobManagement = () => {
     type: '',
     department: '',
     description: '',
-    requirements: ''
+    requirements: '',
+    skills: []
   });
+  const [skillInput, setSkillInput] = useState('');
+
+  const addSkill = () => {
+    if (skillInput.trim() && !formData.skills.includes(skillInput.trim())) {
+      setFormData({ ...formData, skills: [...formData.skills, skillInput.trim()] });
+      setSkillInput('');
+    }
+  };
+
+  const removeSkill = (skillToRemove) => {
+    setFormData({ 
+      ...formData, 
+      skills: formData.skills.filter(skill => skill !== skillToRemove) 
+    });
+  };
 
   const handleSave = () => {
     if (editingId) {
@@ -100,7 +117,7 @@ const JobManagement = () => {
       setJobs([...jobs, newJob]);
       setIsCreating(false);
     }
-    setFormData({ title: '', location: '', type: '', department: '', description: '', requirements: '' });
+    setFormData({ title: '', location: '', type: '', department: '', description: '', requirements: '', skills: [] });
   };
 
   const handleDelete = (id) => {
@@ -114,7 +131,8 @@ const JobManagement = () => {
       type: job.type,
       department: job.department,
       description: job.description || '',
-      requirements: job.requirements || ''
+      requirements: job.requirements || '',
+      skills: job.skills || []
     });
     setEditingId(job.id);
     setIsCreating(true);
@@ -124,7 +142,7 @@ const JobManagement = () => {
     setIsCreating(false);
     setEditingId(null);
     setViewingApplications(null);
-    setFormData({ title: '', location: '', type: '', department: '', description: '', requirements: '' });
+    setFormData({ title: '', location: '', type: '', department: '', description: '', requirements: '', skills: [] });
   };
 
   const updateApplicationStatus = (applicantId, newStatus) => {
@@ -259,6 +277,41 @@ const JobManagement = () => {
                   />
                 </div>
               </div>
+              
+              {/* Skills Section */}
+              <div className="mt-4">
+                <Label htmlFor="skills">Required Skills</Label>
+                <div className="flex gap-2 mb-2">
+                  <Input
+                    id="skills"
+                    value={skillInput}
+                    onChange={(e) => setSkillInput(e.target.value)}
+                    placeholder="Add a skill"
+                    onKeyPress={(e) => e.key === 'Enter' && addSkill()}
+                  />
+                  <Button type="button" onClick={addSkill} variant="outline">
+                    Add
+                  </Button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {formData.skills.map((skill, index) => (
+                    <span
+                      key={index}
+                      className="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-sm flex items-center gap-2"
+                    >
+                      {skill}
+                      <button
+                        type="button"
+                        onClick={() => removeSkill(skill)}
+                        className="text-orange-400 hover:text-orange-600"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              </div>
+
               <div className="mt-4">
                 <Label htmlFor="description">Job Description</Label>
                 <Textarea
@@ -299,6 +352,7 @@ const JobManagement = () => {
                 <TableHead>Location</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>Department</TableHead>
+                <TableHead>Skills</TableHead>
                 <TableHead>Applications</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Actions</TableHead>
@@ -311,6 +365,18 @@ const JobManagement = () => {
                   <TableCell>{job.location}</TableCell>
                   <TableCell>{job.type}</TableCell>
                   <TableCell>{job.department}</TableCell>
+                  <TableCell>
+                    <div className="flex flex-wrap gap-1">
+                      {job.skills?.slice(0, 2).map((skill, index) => (
+                        <span key={index} className="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs">
+                          {skill}
+                        </span>
+                      ))}
+                      {job.skills?.length > 2 && (
+                        <span className="text-gray-500 text-xs">+{job.skills.length - 2}</span>
+                      )}
+                    </div>
+                  </TableCell>
                   <TableCell>
                     <Button
                       size="sm"

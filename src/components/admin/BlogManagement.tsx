@@ -1,12 +1,11 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { PlusCircle, Edit3, Trash2, Save, X, Eye, Upload, Image } from 'lucide-react';
+import { PlusCircle, Edit3, Trash2, Save, X, Eye, Upload, ArrowLeft } from 'lucide-react';
+import MediumStyleEditor from './MediumStyleEditor';
 
 const BlogManagement = () => {
   const [posts, setPosts] = useState([
@@ -46,13 +45,10 @@ const BlogManagement = () => {
     image: ''
   });
 
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      // In a real app, you'd upload to a server
-      const imageUrl = URL.createObjectURL(file);
-      setFormData({ ...formData, image: imageUrl });
-    }
+  const handleImageUpload = (file: File) => {
+    // In a real app, you'd upload to a server
+    const imageUrl = URL.createObjectURL(file);
+    setFormData({ ...formData, image: imageUrl });
   };
 
   const handleSave = () => {
@@ -157,6 +153,124 @@ const BlogManagement = () => {
     );
   }
 
+  // Medium-style editor view
+  if (isCreating) {
+    return (
+      <div className="min-h-screen bg-white">
+        {/* Header */}
+        <div className="border-b border-gray-200 px-6 py-4">
+          <div className="flex items-center justify-between max-w-6xl mx-auto">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                onClick={handleCancel}
+                className="flex items-center gap-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back
+              </Button>
+              <h1 className="text-xl font-semibold text-gray-800">
+                {editingId ? 'Edit Story' : 'Write a Story'}
+              </h1>
+            </div>
+            <div className="flex items-center gap-3">
+              <Button 
+                onClick={() => handlePreview({ ...formData, id: Date.now(), date: new Date().toISOString().split('T')[0] })} 
+                variant="outline"
+                size="sm"
+              >
+                <Eye className="w-4 h-4 mr-2" />
+                Preview
+              </Button>
+              <Button 
+                onClick={handleSave} 
+                className="bg-green-600 hover:bg-green-700"
+                size="sm"
+              >
+                <Save className="w-4 h-4 mr-2" />
+                Publish
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Cover Image Section */}
+        <div className="max-w-4xl mx-auto px-6 py-8">
+          {formData.image ? (
+            <div className="relative mb-8">
+              <img
+                src={formData.image}
+                alt="Cover"
+                className="w-full h-64 object-cover rounded-lg"
+              />
+              <Button
+                size="sm"
+                variant="destructive"
+                className="absolute top-4 right-4"
+                onClick={() => setFormData({ ...formData, image: '' })}
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+          ) : (
+            <label className="block mb-8 border-2 border-dashed border-gray-300 rounded-lg p-8 cursor-pointer hover:border-orange-400 transition-colors">
+              <div className="text-center">
+                <Upload className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+                <p className="text-lg text-gray-600 mb-2">Add a cover image</p>
+                <p className="text-sm text-gray-500">Drag and drop or click to upload</p>
+              </div>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleImageUpload(file);
+                }}
+                className="hidden"
+              />
+            </label>
+          )}
+
+          {/* Medium Style Editor */}
+          <MediumStyleEditor
+            title={formData.title}
+            content={formData.content}
+            excerpt={formData.excerpt}
+            onTitleChange={(title) => setFormData({ ...formData, title })}
+            onContentChange={(content) => setFormData({ ...formData, content })}
+            onExcerptChange={(excerpt) => setFormData({ ...formData, excerpt })}
+            onImageUpload={handleImageUpload}
+          />
+
+          {/* Metadata Section */}
+          <div className="mt-12 pt-8 border-t border-gray-200">
+            <h3 className="text-lg font-semibold mb-4 text-gray-800">Story Settings</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="author">Author</Label>
+                <Input
+                  id="author"
+                  value={formData.author}
+                  onChange={(e) => setFormData({ ...formData, author: e.target.value })}
+                  placeholder="Author name"
+                />
+              </div>
+              <div>
+                <Label htmlFor="category">Category</Label>
+                <Input
+                  id="category"
+                  value={formData.category}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  placeholder="Story category"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <Card>
@@ -164,124 +278,10 @@ const BlogManagement = () => {
           <CardTitle>Blog Posts Management</CardTitle>
           <Button onClick={() => setIsCreating(true)} className="bg-orange-600 hover:bg-orange-700">
             <PlusCircle className="w-4 h-4 mr-2" />
-            New Post
+            Write Story
           </Button>
         </CardHeader>
         <CardContent>
-          {isCreating && (
-            <div className="mb-6 p-6 border rounded-lg bg-gray-50">
-              <h3 className="text-lg font-semibold mb-4">
-                {editingId ? 'Edit Post' : 'Create New Post'}
-              </h3>
-              
-              {/* Image Upload */}
-              <div className="mb-4">
-                <Label htmlFor="image">Cover Image</Label>
-                <div className="mt-2">
-                  {formData.image ? (
-                    <div className="relative">
-                      <img
-                        src={formData.image}
-                        alt="Cover"
-                        className="w-full h-48 object-cover rounded-lg"
-                      />
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        className="absolute top-2 right-2"
-                        onClick={() => setFormData({ ...formData, image: '' })}
-                      >
-                        <X className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  ) : (
-                    <label className="border-2 border-dashed border-gray-300 rounded-lg p-6 cursor-pointer hover:border-orange-400 transition-colors">
-                      <div className="text-center">
-                        <Upload className="w-8 h-8 mx-auto text-gray-400 mb-2" />
-                        <p className="text-gray-600">Click to upload cover image</p>
-                      </div>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        className="hidden"
-                      />
-                    </label>
-                  )}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                  <Label htmlFor="title">Title</Label>
-                  <Input
-                    id="title"
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    placeholder="Post title"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="author">Author</Label>
-                  <Input
-                    id="author"
-                    value={formData.author}
-                    onChange={(e) => setFormData({ ...formData, author: e.target.value })}
-                    placeholder="Author name"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="category">Category</Label>
-                  <Input
-                    id="category"
-                    value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    placeholder="Post category"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="excerpt">Excerpt</Label>
-                  <Input
-                    id="excerpt"
-                    value={formData.excerpt}
-                    onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
-                    placeholder="Short description"
-                  />
-                </div>
-              </div>
-              
-              <div className="mb-4">
-                <Label htmlFor="content">Content</Label>
-                <Textarea
-                  id="content"
-                  value={formData.content}
-                  onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                  placeholder="Write your blog post content here..."
-                  rows={10}
-                  className="min-h-[200px]"
-                />
-              </div>
-              
-              <div className="flex gap-2">
-                <Button onClick={handleSave} className="bg-green-600 hover:bg-green-700">
-                  <Save className="w-4 h-4 mr-2" />
-                  Save
-                </Button>
-                <Button 
-                  onClick={() => handlePreview({ ...formData, id: Date.now(), date: new Date().toISOString().split('T')[0] })} 
-                  variant="outline"
-                >
-                  <Eye className="w-4 h-4 mr-2" />
-                  Preview
-                </Button>
-                <Button onClick={handleCancel} variant="outline">
-                  <X className="w-4 h-4 mr-2" />
-                  Cancel
-                </Button>
-              </div>
-            </div>
-          )}
-
           <Table>
             <TableHeader>
               <TableRow>
