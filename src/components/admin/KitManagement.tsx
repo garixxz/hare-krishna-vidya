@@ -3,143 +3,237 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Gift, Edit3, Trash2, Save, X, Eye } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { PlusCircle, Edit3, Trash2, Save, X, Upload, Eye, ToggleLeft, ToggleRight } from 'lucide-react';
 
 const KitManagement = () => {
   const [kits, setKits] = useState([
     {
-      id: 'hope-basic',
-      name: 'Hope Basic Kit',
-      description: 'Essential food items for a family of 4 for one week',
-      category: 'Food',
+      id: 1,
+      name: 'Annadanam Kit',
+      description: 'Complete meal kit providing nutritious food for families in need',
       price: 500,
-      image: 'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=300&h=200&fit=crop',
-      isActive: true,
-      lastUpdated: '2024-05-20'
+      image: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+      category: 'Food',
+      active: true,
+      items: ['Rice 5kg', 'Dal 2kg', 'Oil 1L', 'Spices', 'Vegetables']
     },
     {
-      id: 'hope-premium',
-      name: 'Hope Premium Kit',
-      description: 'Complete nutrition kit with premium items for a family of 4',
-      category: 'Food',
-      price: 1000,
-      image: 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=300&h=200&fit=crop',
-      isActive: true,
-      lastUpdated: '2024-05-18'
+      id: 2,
+      name: 'Vidya Kit',
+      description: 'Educational supplies kit for underprivileged children',
+      price: 750,
+      image: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+      category: 'Education',
+      active: true,
+      items: ['Notebooks 10', 'Pencils', 'Eraser', 'Scale', 'School Bag']
     },
     {
-      id: 'hope-family',
-      name: 'Hope Family Kit',
-      description: 'Comprehensive kit for larger families with extended support',
-      category: 'Food',
-      price: 1500,
-      image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=300&h=200&fit=crop',
-      isActive: false,
-      lastUpdated: '2024-05-15'
+      id: 3,
+      name: 'Swasthya Kit',
+      description: 'Healthcare and hygiene essentials for families',
+      price: 350,
+      image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+      category: 'Health',
+      active: true,
+      items: ['Soap', 'Toothpaste', 'Toothbrush', 'Sanitizer', 'First Aid']
     }
   ]);
 
-  const [isEditing, setIsEditing] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [isCreating, setIsCreating] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [previewKit, setPreviewKit] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    category: 'Food',
-    price: 0,
+    price: '',
+    category: '',
     image: '',
-    isActive: true
+    items: []
   });
 
-  const handleEdit = (kit: any) => {
-    setFormData({
-      name: kit.name,
-      description: kit.description,
-      category: kit.category,
-      price: kit.price,
-      image: kit.image,
-      isActive: kit.isActive
-    });
-    setEditingId(kit.id);
-    setIsEditing(true);
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      setFormData({ ...formData, image: imageUrl });
+    }
   };
 
   const handleSave = () => {
     if (editingId) {
       setKits(kits.map(kit => 
         kit.id === editingId 
-          ? { ...kit, ...formData, lastUpdated: new Date().toISOString().split('T')[0] }
+          ? { ...kit, ...formData, price: parseFloat(formData.price) }
           : kit
       ));
       setEditingId(null);
     } else {
       const newKit = {
-        id: `${formData.name.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`,
+        id: Date.now(),
         ...formData,
-        lastUpdated: new Date().toISOString().split('T')[0]
+        price: parseFloat(formData.price),
+        active: true,
+        items: formData.items.length > 0 ? formData.items : ['Item 1', 'Item 2', 'Item 3']
       };
       setKits([...kits, newKit]);
+      setIsCreating(false);
     }
-    setIsEditing(false);
-    setFormData({ name: '', description: '', category: 'Food', price: 0, image: '', isActive: true });
+    setFormData({ name: '', description: '', price: '', category: '', image: '', items: [] });
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = (id) => {
     setKits(kits.filter(kit => kit.id !== id));
   };
 
-  const toggleActive = (id: string) => {
+  const handleEdit = (kit) => {
+    setFormData({
+      name: kit.name,
+      description: kit.description,
+      price: kit.price.toString(),
+      category: kit.category,
+      image: kit.image,
+      items: kit.items || []
+    });
+    setEditingId(kit.id);
+    setIsCreating(true);
+  };
+
+  const handleCancel = () => {
+    setIsCreating(false);
+    setEditingId(null);
+    setPreviewKit(null);
+    setFormData({ name: '', description: '', price: '', category: '', image: '', items: [] });
+  };
+
+  const toggleKitStatus = (id) => {
     setKits(kits.map(kit => 
-      kit.id === id ? { ...kit, isActive: !kit.isActive } : kit
+      kit.id === id 
+        ? { ...kit, active: !kit.active }
+        : kit
     ));
   };
+
+  const handlePreview = (kit) => {
+    setPreviewKit(kit);
+  };
+
+  if (previewKit) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold">Kit Preview</h2>
+          <Button onClick={() => setPreviewKit(null)} variant="outline">
+            <X className="w-4 h-4 mr-2" />
+            Close Preview
+          </Button>
+        </div>
+        
+        {/* Kit Preview Card */}
+        <Card className="max-w-md mx-auto overflow-hidden hover:shadow-lg transition-shadow">
+          <div className="aspect-square overflow-hidden">
+            <img
+              src={previewKit.image}
+              alt={previewKit.name}
+              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+            />
+          </div>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <span className="bg-orange-100 text-orange-600 px-2 py-1 rounded-full text-xs">
+                {previewKit.category}
+              </span>
+              <span className="text-2xl font-bold text-orange-600">₹{previewKit.price}</span>
+            </div>
+            <CardTitle className="text-xl">{previewKit.name}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-600 mb-4">{previewKit.description}</p>
+            <div className="mb-4">
+              <h4 className="font-semibold mb-2">What's included:</h4>
+              <ul className="text-sm text-gray-600 space-y-1">
+                {previewKit.items.map((item, index) => (
+                  <li key={index} className="flex items-center">
+                    <span className="w-2 h-2 bg-orange-400 rounded-full mr-2"></span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <Button className="w-full bg-orange-600 hover:bg-orange-700">
+              Donate This Kit
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <Gift className="w-6 h-6 text-orange-600" />
-            <div>
-              <CardTitle>Donation Kit Manager</CardTitle>
-              <p className="text-sm text-gray-600 mt-1">Create and manage donation kits</p>
-            </div>
-          </div>
-          <Button onClick={() => setIsEditing(true)} className="bg-orange-600 hover:bg-orange-700">
-            <Gift className="w-4 h-4 mr-2" />
-            Add Kit
+          <CardTitle>Donation Kits Management</CardTitle>
+          <Button onClick={() => setIsCreating(true)} className="bg-orange-600 hover:bg-orange-700">
+            <PlusCircle className="w-4 h-4 mr-2" />
+            New Kit
           </Button>
         </CardHeader>
         <CardContent>
-          {isEditing && (
-            <div className="mb-6 p-6 border rounded-lg bg-orange-50">
-              <h3 className="text-lg font-semibold mb-4 text-orange-800">
+          {isCreating && (
+            <div className="mb-6 p-6 border rounded-lg bg-gray-50">
+              <h3 className="text-lg font-semibold mb-4">
                 {editingId ? 'Edit Kit' : 'Create New Kit'}
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              
+              {/* Image Upload */}
+              <div className="mb-4">
+                <Label htmlFor="image">Kit Image</Label>
+                <div className="mt-2">
+                  {formData.image ? (
+                    <div className="relative">
+                      <img
+                        src={formData.image}
+                        alt="Kit"
+                        className="w-full h-48 object-cover rounded-lg"
+                      />
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        className="absolute top-2 right-2"
+                        onClick={() => setFormData({ ...formData, image: '' })}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <label className="border-2 border-dashed border-gray-300 rounded-lg p-6 cursor-pointer hover:border-orange-400 transition-colors">
+                      <div className="text-center">
+                        <Upload className="w-8 h-8 mx-auto text-gray-400 mb-2" />
+                        <p className="text-gray-600">Click to upload kit image</p>
+                      </div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                      />
+                    </label>
+                  )}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
-                  <Label htmlFor="kitName">Kit Name</Label>
+                  <Label htmlFor="name">Kit Name</Label>
                   <Input
-                    id="kitName"
+                    id="name"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="e.g., Education Kit"
+                    placeholder="Kit name"
                   />
-                </div>
-                <div>
-                  <Label htmlFor="category">Category</Label>
-                  <select
-                    id="category"
-                    value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  >
-                    <option value="Food">Food</option>
-                    <option value="Education">Education</option>
-                    <option value="Health">Health</option>
-                    <option value="Hygiene">Hygiene</option>
-                  </select>
                 </div>
                 <div>
                   <Label htmlFor="price">Price (₹)</Label>
@@ -147,46 +241,51 @@ const KitManagement = () => {
                     id="price"
                     type="number"
                     value={formData.price}
-                    onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })}
+                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                     placeholder="0"
                   />
                 </div>
-                <div>
-                  <Label htmlFor="image">Image URL</Label>
-                  <Input
-                    id="image"
-                    value={formData.image}
-                    onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                    placeholder="https://..."
-                  />
+                <div className="md:col-span-2">
+                  <Label htmlFor="category">Category</Label>
+                  <select
+                    id="category"
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  >
+                    <option value="">Select category</option>
+                    <option value="Food">Food</option>
+                    <option value="Education">Education</option>
+                    <option value="Health">Health</option>
+                    <option value="Clothing">Clothing</option>
+                  </select>
                 </div>
               </div>
-              <div className="mt-4">
+              
+              <div className="mb-4">
                 <Label htmlFor="description">Description</Label>
                 <Textarea
                   id="description"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Describe what's included in this kit..."
+                  placeholder="Kit description"
                   rows={3}
                 />
               </div>
-              <div className="flex items-center gap-2 mt-4">
-                <input
-                  type="checkbox"
-                  id="isActive"
-                  checked={formData.isActive}
-                  onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                  className="rounded"
-                />
-                <Label htmlFor="isActive">Make kit visible to donors</Label>
-              </div>
-              <div className="flex gap-2 mt-4">
+              
+              <div className="flex gap-2">
                 <Button onClick={handleSave} className="bg-green-600 hover:bg-green-700">
                   <Save className="w-4 h-4 mr-2" />
-                  Save Kit
+                  Save
                 </Button>
-                <Button onClick={() => setIsEditing(false)} variant="outline">
+                <Button 
+                  onClick={() => handlePreview({ ...formData, id: Date.now(), active: true, items: ['Item 1', 'Item 2', 'Item 3'] })} 
+                  variant="outline"
+                >
+                  <Eye className="w-4 h-4 mr-2" />
+                  Preview
+                </Button>
+                <Button onClick={handleCancel} variant="outline">
                   <X className="w-4 h-4 mr-2" />
                   Cancel
                 </Button>
@@ -194,74 +293,79 @@ const KitManagement = () => {
             </div>
           )}
 
-          {/* Kit Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {kits.map((kit) => (
-              <Card key={kit.id} className={`overflow-hidden ${kit.isActive ? 'border-green-200' : 'border-gray-200 opacity-75'}`}>
-                <div className="relative">
-                  <img 
-                    src={kit.image} 
-                    alt={kit.name} 
-                    className="w-full h-48 object-cover"
-                  />
-                  <div className="absolute top-2 right-2">
-                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                      kit.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
-                    }`}>
-                      {kit.isActive ? 'Active' : 'Inactive'}
-                    </span>
-                  </div>
-                </div>
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between mb-2">
-                    <h3 className="font-semibold text-lg">{kit.name}</h3>
-                    <span className="text-lg font-bold text-orange-600">₹{kit.price}</span>
-                  </div>
-                  <p className="text-sm text-gray-600 mb-3">{kit.description}</p>
-                  <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
-                    <span className="px-2 py-1 bg-orange-100 text-orange-700 rounded-full">
-                      {kit.category}
-                    </span>
-                    <span>Updated: {kit.lastUpdated}</span>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="outline" onClick={() => handleEdit(kit)}>
-                      <Edit3 className="w-3 h-3 mr-1" />
-                      Edit
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      variant={kit.isActive ? "secondary" : "default"} 
-                      onClick={() => toggleActive(kit.id)}
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Image</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Price</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {kits.map((kit) => (
+                <TableRow key={kit.id}>
+                  <TableCell>
+                    <img 
+                      src={kit.image} 
+                      alt={kit.name} 
+                      className="w-12 h-12 object-cover rounded"
+                    />
+                  </TableCell>
+                  <TableCell className="font-medium">{kit.name}</TableCell>
+                  <TableCell>{kit.category}</TableCell>
+                  <TableCell>₹{kit.price}</TableCell>
+                  <TableCell>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => toggleKitStatus(kit.id)}
+                      className="flex items-center gap-2"
                     >
-                      {kit.isActive ? 'Deactivate' : 'Activate'}
+                      {kit.active ? (
+                        <>
+                          <ToggleRight className="w-4 h-4 text-green-600" />
+                          Active
+                        </>
+                      ) : (
+                        <>
+                          <ToggleLeft className="w-4 h-4 text-gray-400" />
+                          Inactive
+                        </>
+                      )}
                     </Button>
-                    <Button size="sm" variant="destructive" onClick={() => handleDelete(kit.id)}>
-                      <Trash2 className="w-3 h-3" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Kit Preview */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Eye className="w-5 h-5" />
-            Live Preview
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-gray-600 mb-4">
-            See how your donation kits appear to donors on the frontend
-          </p>
-          <Button variant="outline">
-            🔗 View Live Donation Page
-          </Button>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handlePreview(kit)}
+                      >
+                        <Eye className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleEdit(kit)}
+                      >
+                        <Edit3 className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleDelete(kit.id)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
     </div>

@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { PlusCircle, Edit3, Trash2, Save, X } from 'lucide-react';
+import { PlusCircle, Edit3, Trash2, Save, X, Users, Eye, FileText } from 'lucide-react';
 
 const JobManagement = () => {
   const [jobs, setJobs] = useState([
@@ -16,7 +16,10 @@ const JobManagement = () => {
       location: 'Mumbai, India',
       type: 'Full-time',
       department: 'Operations',
-      status: 'Active'
+      status: 'Active',
+      applications: 12,
+      description: 'We are looking for a dedicated Program Coordinator to manage our food distribution programs.',
+      requirements: 'Bachelor\'s degree, 2+ years experience in NGO work'
     },
     {
       id: 2,
@@ -24,12 +27,52 @@ const JobManagement = () => {
       location: 'Delhi, India',
       type: 'Part-time',
       department: 'Community',
-      status: 'Active'
+      status: 'Active',
+      applications: 8,
+      description: 'Manage and coordinate volunteer activities across different programs.',
+      requirements: 'Experience in volunteer management, excellent communication skills'
+    }
+  ]);
+
+  const [applicants] = useState([
+    {
+      id: 1,
+      name: 'Priya Sharma',
+      email: 'priya.sharma@email.com',
+      jobId: 1,
+      jobTitle: 'Program Coordinator',
+      appliedDate: '2024-05-18',
+      status: 'Pending',
+      experience: '3 years',
+      notes: ''
+    },
+    {
+      id: 2,
+      name: 'Rajesh Kumar',
+      email: 'rajesh.kumar@email.com',
+      jobId: 1,
+      jobTitle: 'Program Coordinator',
+      appliedDate: '2024-05-17',
+      status: 'Shortlisted',
+      experience: '5 years',
+      notes: 'Strong candidate with relevant NGO experience'
+    },
+    {
+      id: 3,
+      name: 'Anita Gupta',
+      email: 'anita.gupta@email.com',
+      jobId: 2,
+      jobTitle: 'Volunteer Manager',
+      appliedDate: '2024-05-16',
+      status: 'Pending',
+      experience: '2 years',
+      notes: ''
     }
   ]);
 
   const [isCreating, setIsCreating] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [viewingApplications, setViewingApplications] = useState(null);
   const [formData, setFormData] = useState({
     title: '',
     location: '',
@@ -51,7 +94,8 @@ const JobManagement = () => {
       const newJob = {
         id: Date.now(),
         ...formData,
-        status: 'Active'
+        status: 'Active',
+        applications: 0
       };
       setJobs([...jobs, newJob]);
       setIsCreating(false);
@@ -79,8 +123,87 @@ const JobManagement = () => {
   const handleCancel = () => {
     setIsCreating(false);
     setEditingId(null);
+    setViewingApplications(null);
     setFormData({ title: '', location: '', type: '', department: '', description: '', requirements: '' });
   };
+
+  const updateApplicationStatus = (applicantId, newStatus) => {
+    // In a real app, this would update the database
+    console.log(`Updated applicant ${applicantId} status to ${newStatus}`);
+  };
+
+  if (viewingApplications) {
+    const jobApplications = applicants.filter(app => app.jobId === viewingApplications.id);
+    
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold">Applications for {viewingApplications.title}</h2>
+            <p className="text-gray-600">{jobApplications.length} applications received</p>
+          </div>
+          <Button onClick={() => setViewingApplications(null)} variant="outline">
+            <X className="w-4 h-4 mr-2" />
+            Back to Jobs
+          </Button>
+        </div>
+
+        <Card>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Candidate Name</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Experience</TableHead>
+                  <TableHead>Applied Date</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {jobApplications.map((applicant) => (
+                  <TableRow key={applicant.id}>
+                    <TableCell className="font-medium">{applicant.name}</TableCell>
+                    <TableCell>{applicant.email}</TableCell>
+                    <TableCell>{applicant.experience}</TableCell>
+                    <TableCell>{applicant.appliedDate}</TableCell>
+                    <TableCell>
+                      <select
+                        value={applicant.status}
+                        onChange={(e) => updateApplicationStatus(applicant.id, e.target.value)}
+                        className={`px-2 py-1 rounded-full text-xs border-0 ${
+                          applicant.status === 'Shortlisted' 
+                            ? 'bg-green-100 text-green-600' 
+                            : applicant.status === 'Rejected'
+                            ? 'bg-red-100 text-red-600'
+                            : 'bg-yellow-100 text-yellow-600'
+                        }`}
+                      >
+                        <option value="Pending">Pending</option>
+                        <option value="Shortlisted">Shortlisted</option>
+                        <option value="Rejected">Rejected</option>
+                      </select>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button size="sm" variant="outline">
+                          <FileText className="w-4 h-4" />
+                        </Button>
+                        <Button size="sm" variant="outline">
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -176,6 +299,7 @@ const JobManagement = () => {
                 <TableHead>Location</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>Department</TableHead>
+                <TableHead>Applications</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
@@ -187,6 +311,17 @@ const JobManagement = () => {
                   <TableCell>{job.location}</TableCell>
                   <TableCell>{job.type}</TableCell>
                   <TableCell>{job.department}</TableCell>
+                  <TableCell>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setViewingApplications(job)}
+                      className="flex items-center gap-2"
+                    >
+                      <Users className="w-4 h-4" />
+                      {job.applications || 0}
+                    </Button>
+                  </TableCell>
                   <TableCell>
                     <span className="px-2 py-1 rounded-full text-xs bg-green-100 text-green-600">
                       {job.status}
