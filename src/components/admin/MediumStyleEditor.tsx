@@ -1,8 +1,7 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Bold, Italic, Link, Image, Plus, Quote, List, ListOrdered, Heading1, Heading2, Heading3, Type, AlignLeft, AlignCenter, Separator } from 'lucide-react';
+import { Bold, Italic, Link, Image, Plus, Quote, List, ListOrdered, Heading1, Heading2, Heading3, Type, AlignLeft, AlignCenter, Minus } from 'lucide-react';
 
 interface MediumStyleEditorProps {
   title: string;
@@ -252,7 +251,7 @@ const MediumStyleEditor: React.FC<MediumStyleEditorProps> = ({
               onClick={() => insertElement('divider')}
               title="Add Divider"
             >
-              <Separator className="w-4 h-4" />
+              <Minus className="w-4 h-4" />
             </Button>
             
             <Button
