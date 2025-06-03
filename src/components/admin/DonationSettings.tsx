@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Save, Edit3, RefreshCw } from 'lucide-react';
+import { Save, Edit3, RefreshCw, Settings } from 'lucide-react';
 
 const DonationSettings = () => {
   const [kits, setKits] = useState([
@@ -74,6 +74,19 @@ const DonationSettings = () => {
 
   return (
     <div className="space-y-6">
+      {/* Settings Header */}
+      <Card className="border-orange-200">
+        <CardHeader className="bg-gradient-to-r from-orange-50 to-amber-50">
+          <div className="flex items-center space-x-3">
+            <Settings className="w-6 h-6 text-orange-600" />
+            <div>
+              <CardTitle className="text-orange-800">Donation Settings</CardTitle>
+              <p className="text-sm text-orange-600 mt-1">Configure pricing and donation parameters</p>
+            </div>
+          </div>
+        </CardHeader>
+      </Card>
+
       {/* Kit Pricing */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
@@ -184,7 +197,7 @@ const DonationSettings = () => {
       {/* Pricing Guidelines */}
       <Card>
         <CardHeader>
-          <CardTitle>Pricing Guidelines</CardTitle>
+          <CardTitle>Pricing Guidelines & Audit Trail</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid md:grid-cols-2 gap-6">
@@ -196,6 +209,11 @@ const DonationSettings = () => {
                 <li>• Maintain transparency with donors</li>
                 <li>• Factor in distribution costs</li>
               </ul>
+              <div className="mt-4 p-3 bg-orange-50 rounded-lg">
+                <p className="text-sm text-orange-700">
+                  <strong>Last updated:</strong> May 20, 2024 at 2:30 PM by Admin User
+                </p>
+              </div>
             </div>
             <div>
               <h4 className="font-semibold mb-2">Notes</h4>
@@ -204,6 +222,7 @@ const DonationSettings = () => {
                 rows={4}
                 className="resize-none"
               />
+              <Button className="mt-2" size="sm">Save Notes</Button>
             </div>
           </div>
         </CardContent>
