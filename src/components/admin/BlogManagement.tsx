@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { PlusCircle, Edit3, Trash2, Save, X, Eye, Upload, ArrowLeft } from 'lucide-react';
+import { PlusCircle, Edit3, Trash2, Save, X, Eye, Upload, ArrowLeft, Calendar, User, Tag, Camera, FileText } from 'lucide-react';
 import MediumStyleEditor from './MediumStyleEditor';
 
 const BlogManagement = () => {
@@ -110,159 +110,214 @@ const BlogManagement = () => {
 
   if (previewPost) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold">Blog Preview</h2>
-          <Button onClick={() => setPreviewPost(null)} variant="outline">
-            <X className="w-4 h-4 mr-2" />
-            Close Preview
-          </Button>
+      <div className="space-y-6 bg-gray-50 min-h-screen">
+        <div className="bg-white border-b border-gray-200 px-6 py-4">
+          <div className="flex items-center justify-between max-w-6xl mx-auto">
+            <h2 className="text-2xl font-bold text-gray-900">Blog Preview</h2>
+            <Button onClick={() => setPreviewPost(null)} variant="outline" className="flex items-center gap-2">
+              <ArrowLeft className="w-4 h-4" />
+              Back to Editor
+            </Button>
+          </div>
         </div>
         
-        {/* Blog Preview */}
-        <Card className="max-w-4xl mx-auto">
-          <div className="aspect-video overflow-hidden rounded-t-lg">
+        {/* Enhanced Blog Preview */}
+        <div className="max-w-4xl mx-auto px-6">
+          <Card className="shadow-lg border-0">
             {previewPost.image && (
-              <img
-                src={previewPost.image}
-                alt={previewPost.title}
-                className="w-full h-full object-cover"
-              />
+              <div className="aspect-[16/9] overflow-hidden rounded-t-lg">
+                <img
+                  src={previewPost.image}
+                  alt={previewPost.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
             )}
-          </div>
-          <CardContent className="p-8">
-            <div className="mb-4">
-              <span className="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-sm">
-                {previewPost.category}
-              </span>
-            </div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">{previewPost.title}</h1>
-            <div className="flex items-center text-gray-600 mb-6">
-              <span>By {previewPost.author}</span>
-              <span className="mx-2">•</span>
-              <span>{new Date(previewPost.date).toLocaleDateString()}</span>
-            </div>
-            <div className="prose max-w-none">
-              <p className="text-lg text-gray-700 leading-relaxed">
-                {previewPost.content}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+            <CardContent className="p-12">
+              <div className="mb-6">
+                <span className="bg-orange-100 text-orange-700 px-4 py-2 rounded-full text-sm font-medium">
+                  {previewPost.category}
+                </span>
+              </div>
+              <h1 className="text-5xl font-bold text-gray-900 mb-6 leading-tight" style={{ fontFamily: 'Georgia, serif' }}>
+                {previewPost.title}
+              </h1>
+              {previewPost.excerpt && (
+                <p className="text-xl text-gray-600 mb-8 leading-relaxed font-light" style={{ fontFamily: 'Georgia, serif' }}>
+                  {previewPost.excerpt}
+                </p>
+              )}
+              <div className="flex items-center text-gray-600 mb-8 text-lg">
+                <User className="w-5 h-5 mr-2" />
+                <span className="font-medium">{previewPost.author}</span>
+                <span className="mx-3">•</span>
+                <Calendar className="w-5 h-5 mr-2" />
+                <span>{new Date(previewPost.date).toLocaleDateString('en-US', { 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })}</span>
+              </div>
+              <div className="prose prose-lg max-w-none">
+                <div className="text-xl text-gray-800 leading-relaxed whitespace-pre-wrap" style={{ fontFamily: 'Georgia, serif' }}>
+                  {previewPost.content}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
 
-  // Medium-style editor view
+  // Enhanced Medium-style editor view
   if (isCreating) {
     return (
       <div className="min-h-screen bg-white">
-        {/* Header */}
-        <div className="border-b border-gray-200 px-6 py-4">
-          <div className="flex items-center justify-between max-w-6xl mx-auto">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                onClick={handleCancel}
-                className="flex items-center gap-2"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Back
-              </Button>
-              <h1 className="text-xl font-semibold text-gray-800">
-                {editingId ? 'Edit Story' : 'Write a Story'}
-              </h1>
-            </div>
-            <div className="flex items-center gap-3">
-              <Button 
-                onClick={() => handlePreview({ ...formData, id: Date.now(), date: new Date().toISOString().split('T')[0] })} 
-                variant="outline"
-                size="sm"
-              >
-                <Eye className="w-4 h-4 mr-2" />
-                Preview
-              </Button>
-              <Button 
-                onClick={handleSave} 
-                className="bg-green-600 hover:bg-green-700"
-                size="sm"
-              >
-                <Save className="w-4 h-4 mr-2" />
-                Publish
-              </Button>
+        {/* Enhanced Header */}
+        <div className="border-b border-gray-200 bg-white/95 backdrop-blur-sm sticky top-0 z-40">
+          <div className="px-6 py-4">
+            <div className="flex items-center justify-between max-w-6xl mx-auto">
+              <div className="flex items-center gap-4">
+                <Button
+                  variant="ghost"
+                  onClick={handleCancel}
+                  className="flex items-center gap-2 hover:bg-gray-100"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  Back
+                </Button>
+                <div className="h-6 w-px bg-gray-300" />
+                <h1 className="text-xl font-semibold text-gray-800">
+                  {editingId ? 'Edit Story' : 'Write a Story'}
+                </h1>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-gray-500">
+                  Draft auto-saved
+                </span>
+                <Button 
+                  onClick={() => handlePreview({ 
+                    ...formData, 
+                    id: Date.now(), 
+                    date: new Date().toISOString().split('T')[0],
+                    status: 'Draft'
+                  })} 
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  <Eye className="w-4 h-4" />
+                  Preview
+                </Button>
+                <Button 
+                  onClick={handleSave} 
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                  size="sm"
+                >
+                  <Save className="w-4 h-4 mr-2" />
+                  Publish
+                </Button>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Cover Image Section */}
-        <div className="max-w-4xl mx-auto px-6 py-8">
-          {formData.image ? (
-            <div className="relative mb-8">
-              <img
-                src={formData.image}
-                alt="Cover"
-                className="w-full h-64 object-cover rounded-lg"
-              />
-              <Button
-                size="sm"
-                variant="destructive"
-                className="absolute top-4 right-4"
-                onClick={() => setFormData({ ...formData, image: '' })}
-              >
-                <X className="w-4 h-4" />
-              </Button>
-            </div>
-          ) : (
-            <label className="block mb-8 border-2 border-dashed border-gray-300 rounded-lg p-8 cursor-pointer hover:border-orange-400 transition-colors">
-              <div className="text-center">
-                <Upload className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-                <p className="text-lg text-gray-600 mb-2">Add a cover image</p>
-                <p className="text-sm text-gray-500">Drag and drop or click to upload</p>
-              </div>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) handleImageUpload(file);
-                }}
-                className="hidden"
-              />
-            </label>
-          )}
-
-          {/* Medium Style Editor */}
-          <MediumStyleEditor
-            title={formData.title}
-            content={formData.content}
-            excerpt={formData.excerpt}
-            onTitleChange={(title) => setFormData({ ...formData, title })}
-            onContentChange={(content) => setFormData({ ...formData, content })}
-            onExcerptChange={(excerpt) => setFormData({ ...formData, excerpt })}
-            onImageUpload={handleImageUpload}
-          />
-
-          {/* Metadata Section */}
-          <div className="mt-12 pt-8 border-t border-gray-200">
-            <h3 className="text-lg font-semibold mb-4 text-gray-800">Story Settings</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="author">Author</Label>
-                <Input
-                  id="author"
-                  value={formData.author}
-                  onChange={(e) => setFormData({ ...formData, author: e.target.value })}
-                  placeholder="Author name"
+        <div className="max-w-5xl mx-auto">
+          {/* Enhanced Cover Image Section */}
+          <div className="px-6 py-12">
+            {formData.image ? (
+              <div className="relative mb-12 group">
+                <img
+                  src={formData.image}
+                  alt="Cover"
+                  className="w-full h-80 object-cover rounded-xl shadow-lg"
                 />
+                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 rounded-xl flex items-center justify-center">
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                    onClick={() => setFormData({ ...formData, image: '' })}
+                  >
+                    <X className="w-4 h-4 mr-2" />
+                    Remove Cover
+                  </Button>
+                </div>
               </div>
-              <div>
-                <Label htmlFor="category">Category</Label>
-                <Input
-                  id="category"
-                  value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  placeholder="Story category"
+            ) : (
+              <label className="block mb-12 border-2 border-dashed border-gray-300 rounded-xl p-12 cursor-pointer hover:border-orange-400 hover:bg-orange-50/50 transition-all duration-200 group">
+                <div className="text-center">
+                  <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 group-hover:bg-orange-100 transition-colors">
+                    <Camera className="w-8 h-8 text-gray-400 group-hover:text-orange-500" />
+                  </div>
+                  <p className="text-xl text-gray-700 mb-2 font-medium">Add a cover image</p>
+                  <p className="text-sm text-gray-500">Drag and drop an image, or click to browse</p>
+                  <p className="text-xs text-gray-400 mt-2">Recommended: 1600 x 900 pixels</p>
+                </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleImageUpload(file);
+                  }}
+                  className="hidden"
                 />
+              </label>
+            )}
+
+            {/* Medium Style Editor */}
+            <MediumStyleEditor
+              title={formData.title}
+              content={formData.content}
+              excerpt={formData.excerpt}
+              onTitleChange={(title) => setFormData({ ...formData, title })}
+              onContentChange={(content) => setFormData({ ...formData, content })}
+              onExcerptChange={(excerpt) => setFormData({ ...formData, excerpt })}
+              onImageUpload={handleImageUpload}
+            />
+
+            {/* Enhanced Metadata Section */}
+            <div className="mt-16 pt-8 border-t border-gray-200">
+              <div className="bg-gray-50 rounded-xl p-8">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                    <FileText className="w-5 h-5 text-orange-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">Story Settings</h3>
+                    <p className="text-sm text-gray-600">Configure your story's metadata and settings</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="author" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                      <User className="w-4 h-4" />
+                      Author
+                    </Label>
+                    <Input
+                      id="author"
+                      value={formData.author}
+                      onChange={(e) => setFormData({ ...formData, author: e.target.value })}
+                      placeholder="Enter author name"
+                      className="bg-white border-gray-300 focus:border-orange-400 focus:ring-orange-400"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="category" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                      <Tag className="w-4 h-4" />
+                      Category
+                    </Label>
+                    <Input
+                      id="category"
+                      value={formData.category}
+                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                      placeholder="Enter story category"
+                      className="bg-white border-gray-300 focus:border-orange-400 focus:ring-orange-400"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -273,15 +328,25 @@ const BlogManagement = () => {
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Blog Posts Management</CardTitle>
-          <Button onClick={() => setIsCreating(true)} className="bg-orange-600 hover:bg-orange-700">
-            <PlusCircle className="w-4 h-4 mr-2" />
-            Write Story
-          </Button>
+      <Card className="border-0 shadow-lg">
+        <CardHeader className="bg-gradient-to-r from-orange-50 to-amber-50 border-b border-orange-100">
+          <div className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="text-2xl text-gray-900 flex items-center gap-3">
+                <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-orange-600" />
+                </div>
+                Blog Posts Management
+              </CardTitle>
+              <p className="text-gray-600 mt-2">Create, edit, and manage your blog content</p>
+            </div>
+            <Button onClick={() => setIsCreating(true)} className="bg-orange-600 hover:bg-orange-700 text-white shadow-md">
+              <PlusCircle className="w-4 h-4 mr-2" />
+              Write New Story
+            </Button>
+          </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           <Table>
             <TableHeader>
               <TableRow>
