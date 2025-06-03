@@ -181,7 +181,7 @@ const MediumStyleEditor: React.FC<MediumStyleEditorProps> = ({
           id="content-editor"
           value={content}
           onChange={(e) => onContentChange(e.target.value)}
-          onSelect={() => {
+          onSelect={(e) => {
             const textarea = e.target as HTMLTextAreaElement;
             const hasSelection = textarea.selectionStart !== textarea.selectionEnd;
             setShowToolbar(hasSelection);
